@@ -15,8 +15,7 @@
 //
 
 import Foundation
-// TODO: Add FirebaseFirestore package in Xcode, then uncomment:
-// import FirebaseFirestore
+import FirebaseFirestore
 
 // MARK: - Cloud User Profile (Minimal data for identification)
 /// Lightweight structure for cloud storage - only essential user data
@@ -145,9 +144,9 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
             throw FirestoreUserError.encodingError
         }
 
-        // TODO: Uncomment after adding FirebaseFirestore package in Xcode:
-        // let db = Firestore.firestore()
-        // try await db.collection(usersCollection).document(userId).setData(profileData, merge: true)
+        // Save to Firestore
+        let db = Firestore.firestore()
+        try await db.collection(usersCollection).document(userId).setData(profileData, merge: true)
 
         lastSyncDate = Date()
 
@@ -172,8 +171,7 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
         isSyncing = true
         defer { isSyncing = false }
 
-        // TODO: Uncomment after adding FirebaseFirestore package in Xcode:
-        /*
+        // Load from Firestore
         let db = Firestore.firestore()
         let document = try await db.collection(usersCollection).document(userId).getDocument()
 
@@ -185,12 +183,6 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
         }
 
         return try decodeCloudProfile(data)
-        */
-
-        #if DEBUG
-        print("⚠️ [Firestore] FirebaseFirestore not added yet - using local data only")
-        #endif
-        return nil
     }
 
     // MARK: - Delete User Profile
@@ -201,9 +193,9 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
         print("☁️ [Firestore] Deleting user profile for: \(userId)")
         #endif
 
-        // TODO: Uncomment after adding FirebaseFirestore package in Xcode:
-        // let db = Firestore.firestore()
-        // try await db.collection(usersCollection).document(userId).delete()
+        // Delete from Firestore
+        let db = Firestore.firestore()
+        try await db.collection(usersCollection).document(userId).delete()
 
         #if DEBUG
         print("✅ [Firestore] User profile deleted")

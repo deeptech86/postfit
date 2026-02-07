@@ -1002,7 +1002,7 @@ struct MeasurementInputField: View {
     }
 }
 
-struct ActivityLevelOption: View {
+struct EditActivityLevelOption: View {
     let level: ActivityLevel
     let isSelected: Bool
     let action: () -> Void
