@@ -107,7 +107,9 @@ class UserProfileManager: ObservableObject {
 
     /// Get current user ID from session
     private func getUserId() -> String? {
-        return UserDefaults.standard.string(forKey: Keys.userId)
+        // Check multiple possible keys for user ID
+        return UserDefaults.standard.string(forKey: "userId")      // UserDefaultsManager.Keys.userId
+            ?? UserDefaults.standard.string(forKey: Keys.userId)   // "user_id"
             ?? UserDefaults.standard.string(forKey: "user_id")
     }
 
@@ -291,8 +293,8 @@ class UserProfileManager: ObservableObject {
 
     // MARK: - Cloud Sync Methods
 
-    /// Load profile from cloud on login
-    /// Call this after successful authentication to restore user data
+    /// Load profile from cloud on login, or save initial profile if none exists
+    /// Call this after successful authentication to restore/create user data
     /// Only restores essential data: name, email, subscription, basic health info
     func loadProfileFromCloud() async {
         guard let userId = getUserId() else {
@@ -312,7 +314,42 @@ class UserProfileManager: ObservableObject {
             await mergeCloudProfile(cloudProfile)
         } else {
             #if DEBUG
-            print("ℹ️ [UserProfileManager] No cloud profile found, using local data")
+            print("ℹ️ [UserProfileManager] No cloud profile found, creating initial profile...")
+            #endif
+
+            // No cloud profile exists - save current user to cloud
+            await saveInitialProfileToCloud(userId: userId)
+        }
+    }
+
+    /// Save initial profile to cloud after first login
+    private func saveInitialProfileToCloud(userId: String) async {
+        // Create user from session if we don't have one
+        if currentUser == nil {
+            createUserFromSession()
+        }
+
+        guard let user = currentUser else {
+            #if DEBUG
+            print("⚠️ [UserProfileManager] No user to save to cloud")
+            #endif
+            return
+        }
+
+        // Save to cloud
+        do {
+            try await firestoreService.saveUserProfile(user, userId: userId)
+            lastCloudSyncDate = Date()
+            UserDefaults.standard.set(lastCloudSyncDate?.timeIntervalSince1970, forKey: Keys.lastCloudSync)
+
+            #if DEBUG
+            print("✅ [UserProfileManager] Initial profile saved to cloud:")
+            print("   - Name: \(user.name)")
+            print("   - Email: \(user.email)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ [UserProfileManager] Failed to save initial profile to cloud: \(error)")
             #endif
         }
     }
