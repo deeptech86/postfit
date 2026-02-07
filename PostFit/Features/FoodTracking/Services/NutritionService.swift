@@ -198,12 +198,30 @@ class NutritionService: NutritionServiceProtocol {
 
     /// Get user profile from storage
     private func getUserProfile() -> UserNutritionProfile {
-        // In production, this would fetch from UserDefaults or a user service
-        // For now, return default values with sample breastfeeding adjustment
+        // Read from UserProfileManager for actual user data
+        guard let user = UserProfileManager.shared.currentUser else {
+            // Default values if no user is logged in
+            return UserNutritionProfile(
+                baseCalorieGoal: 1800,
+                isBreastfeeding: false,
+                breastfeedingAdjustment: 0
+            )
+        }
+
+        let healthProfile = user.healthProfile
+        let isBreastfeeding = healthProfile.isBreastfeeding
+        let breastfeedingAdjustment = isBreastfeeding
+            ? (healthProfile.breastfeedingIntensity?.additionalCalories ?? 400)
+            : 0
+
+        // Calculate base calorie goal (total target minus breastfeeding adjustment)
+        let totalTarget = healthProfile.dailyCalorieTarget
+        let baseCalorieGoal = totalTarget - breastfeedingAdjustment
+
         return UserNutritionProfile(
-            baseCalorieGoal: 1500,
-            isBreastfeeding: true,
-            breastfeedingAdjustment: 400
+            baseCalorieGoal: baseCalorieGoal,
+            isBreastfeeding: isBreastfeeding,
+            breastfeedingAdjustment: breastfeedingAdjustment
         )
     }
 

@@ -20,12 +20,16 @@ struct FoodTrackingView: View {
 
     // Shared nutrition data manager
     @StateObject private var nutritionDataManager = NutritionDataManager.shared
+    @StateObject private var profileManager = UserProfileManager.shared
 
     // iCloud sync managers
     @StateObject private var cloudKit = CloudKitManager.shared
     private let retentionManager = DataRetentionManager.shared
 
-    private let calorieGoal = 1900 // Adjusted for breastfeeding
+    /// Calorie goal from user's health profile (calculated based on BMR, activity level, breastfeeding)
+    private var calorieGoal: Int {
+        profileManager.currentUser?.healthProfile.dailyCalorieTarget ?? 1800
+    }
 
 
     var body: some View {
