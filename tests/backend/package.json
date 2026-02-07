@@ -1,0 +1,36 @@
+{
+  "name": "momcare-api-tests",
+  "version": "1.0.0",
+  "description": "API tests for MomCare backend",
+  "scripts": {
+    "cleanup": "node cleanup.js",
+    "pretest": "npm run cleanup",
+    "test": "jest --verbose --runInBand",
+    "test:watch": "jest --watch --verbose",
+    "test:coverage": "jest --coverage --verbose",
+    "test:auth": "npm run cleanup && jest auth.test.js --verbose",
+    "test:food": "jest food.test.js --verbose",
+    "test:hydration": "jest hydration.test.js --verbose",
+    "test:exercises": "jest exercises.test.js --verbose",
+    "test:workouts": "jest workouts.test.js --verbose"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testMatch": [
+      "**/*.test.js"
+    ],
+    "setupFilesAfterEnv": [
+      "./setup.js"
+    ],
+    "testSequencer": "./testSequencer.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "dotenv": "^16.3.1",
+    "pg": "^8.11.3"
+  }
+}

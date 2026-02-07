@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>771017036108-0mqnklnpha1a6sus0jo8imm59aql3n92.apps.googleusercontent.com</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.771017036108-0mqnklnpha1a6sus0jo8imm59aql3n92</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>MomCare needs access to your camera to capture food photos for AI-powered nutrition tracking.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>MomCare needs access to your photo library to select food photos for AI-powered nutrition tracking.</string>
+</dict>
+</plist>
