@@ -487,6 +487,10 @@ struct DeliveryInfoEditView: View {
         healthProfile.deliveryDate = deliveryDate
         healthProfile.deliveryType = selectedDeliveryType
         healthProfile.deliveryComplications = Array(selectedComplications)
+
+        // Explicitly save to UserProfileManager to ensure persistence
+        UserProfileManager.shared.saveHealthProfile(healthProfile)
+
         onSave()
         dismiss()
     }
@@ -737,6 +741,9 @@ struct MeasurementsEditView: View {
         // Save unit preference
         UserProfileManager.shared.updateMeasurementUnit(unit)
 
+        // Explicitly save to UserProfileManager to ensure persistence
+        UserProfileManager.shared.saveHealthProfile(healthProfile)
+
         onSave()
         dismiss()
     }
@@ -865,6 +872,9 @@ struct GoalsEditView: View {
             let unit = UserProfileManager.shared.measurementUnit
             healthProfile.targetWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
         }
+
+        // Explicitly save to UserProfileManager to ensure persistence
+        UserProfileManager.shared.saveHealthProfile(healthProfile)
 
         onSave()
         dismiss()
