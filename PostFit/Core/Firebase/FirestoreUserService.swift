@@ -10,9 +10,12 @@
 //  - Email
 //  - Basic health info (delivery date, delivery type, current weight, height)
 //  - Subscription type (Free/Premium)
+//  - Dietary restrictions
+//  - Medical conditions
 //
 
 import Foundation
+import FirebaseFirestore
 
 // MARK: - Cloud User Profile (Minimal data for identification)
 /// Lightweight structure for cloud storage - only essential user data
@@ -141,11 +144,9 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
             throw FirestoreUserError.encodingError
         }
 
-        // TODO: Uncomment after adding FirebaseFirestore package
-        /*
+        // Save to Firestore
         let db = Firestore.firestore()
         try await db.collection(usersCollection).document(userId).setData(profileData, merge: true)
-        */
 
         lastSyncDate = Date()
 
@@ -170,8 +171,7 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
         isSyncing = true
         defer { isSyncing = false }
 
-        // TODO: Uncomment after adding FirebaseFirestore package
-        /*
+        // Load from Firestore
         let db = Firestore.firestore()
         let document = try await db.collection(usersCollection).document(userId).getDocument()
 
@@ -183,12 +183,6 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
         }
 
         return try decodeCloudProfile(data)
-        */
-
-        #if DEBUG
-        print("⚠️ [Firestore] Firebase not configured, using local data")
-        #endif
-        return nil
     }
 
     // MARK: - Delete User Profile
@@ -199,11 +193,9 @@ class FirestoreUserService: ObservableObject, FirestoreUserServiceProtocol {
         print("☁️ [Firestore] Deleting user profile for: \(userId)")
         #endif
 
-        // TODO: Uncomment after adding FirebaseFirestore package
-        /*
+        // Delete from Firestore
         let db = Firestore.firestore()
         try await db.collection(usersCollection).document(userId).delete()
-        */
 
         #if DEBUG
         print("✅ [Firestore] User profile deleted")

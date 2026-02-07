@@ -10,7 +10,7 @@
 
 import SwiftUI
 import GoogleSignIn
-// import FirebaseCore  // Uncomment after adding Firebase package
+import FirebaseCore
 
 @main
 struct PostFitApp: App {
@@ -32,8 +32,8 @@ struct PostFitApp: App {
     // MARK: - Initialization
 
     init() {
-        // Initialize Firebase (uncomment after adding Firebase package)
-        // FirebaseApp.configure()
+        // Initialize Firebase
+        FirebaseApp.configure()
 
         // Initialize core dependencies
         let keychainManager = KeychainManager()
