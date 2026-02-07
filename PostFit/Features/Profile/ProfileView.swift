@@ -17,6 +17,7 @@ struct ProfileView: View {
     @State private var showPrivacy = false
     @State private var showHelpSupport = false
     @State private var showAllAchievements = false
+    @State private var showSubscription = false
 
     // User session and profile managers
     @StateObject private var userSessionManager = UserSessionManager.shared
@@ -78,7 +79,9 @@ struct ProfileView: View {
                     )
 
                     // Subscription status
-                    SubscriptionCard(status: user.subscriptionStatus)
+                    SubscriptionCard(status: user.subscriptionStatus) {
+                        showSubscription = true
+                    }
 
                     // Sign out button
                     Button(action: {
@@ -124,6 +127,9 @@ struct ProfileView: View {
             }
             .sheet(isPresented: $showAllAchievements) {
                 AllAchievementsView()
+            }
+            .sheet(isPresented: $showSubscription) {
+                SubscriptionView()
             }
         }
     }
@@ -448,6 +454,23 @@ struct ProfileMenuItem: View {
 // MARK: - Subscription Card
 struct SubscriptionCard: View {
     let status: SubscriptionStatus
+    let onUpgrade: () -> Void
+
+    private var statusTitle: String {
+        switch status {
+        case .premium: return "Premium Member"
+        case .trial: return "Trial Active"
+        case .free: return "Free Plan"
+        }
+    }
+
+    private var statusSubtitle: String {
+        switch status {
+        case .premium: return "All features unlocked"
+        case .trial: return "Enjoying premium features"
+        case .free: return "Upgrade for full access"
+        }
+    }
 
     var body: some View {
         MomCareCard {
@@ -455,17 +478,17 @@ struct SubscriptionCard: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
-                            Text(status == .premium ? "Premium Member" : "Free Plan")
+                            Text(statusTitle)
                                 .font(.momCareHeading3)
                                 .foregroundColor(.momCareTextPrimary)
 
-                            if status == .premium {
-                                Image(systemName: "checkmark.seal.fill")
-                                    .foregroundColor(.momCareAccent)
+                            if status == .premium || status == .trial {
+                                Image(systemName: status == .premium ? "checkmark.seal.fill" : "clock.fill")
+                                    .foregroundColor(status == .premium ? .momCareAccent : .momCareWarning)
                             }
                         }
 
-                        Text(status == .premium ? "All features unlocked" : "Upgrade for full access")
+                        Text(statusSubtitle)
                             .font(.momCareCaption)
                             .foregroundColor(.momCareTextSecondary)
                     }
@@ -474,8 +497,12 @@ struct SubscriptionCard: View {
                 }
 
                 if status == .free {
-                    MomCarePrimaryButton("Upgrade to Premium", size: .small) {
-                        // Show subscription options
+                    MomCarePrimaryButton("Start 7-Day Free Trial", size: .small) {
+                        onUpgrade()
+                    }
+                } else if status == .trial {
+                    MomCareSecondaryButton("Manage Subscription", size: .small) {
+                        onUpgrade()
                     }
                 }
             }
