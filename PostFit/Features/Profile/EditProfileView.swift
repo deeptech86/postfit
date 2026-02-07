@@ -484,12 +484,19 @@ struct DeliveryInfoEditView: View {
     }
 
     private func saveChanges() {
-        healthProfile.deliveryDate = deliveryDate
-        healthProfile.deliveryType = selectedDeliveryType
-        healthProfile.deliveryComplications = Array(selectedComplications)
+        // Get current user and update directly to avoid binding issues
+        guard var user = UserProfileManager.shared.currentUser else {
+            dismiss()
+            return
+        }
 
-        // Explicitly save to UserProfileManager to ensure persistence
-        UserProfileManager.shared.saveHealthProfile(healthProfile)
+        // Update delivery info
+        user.healthProfile.deliveryDate = deliveryDate
+        user.healthProfile.deliveryType = selectedDeliveryType
+        user.healthProfile.deliveryComplications = Array(selectedComplications)
+
+        // Save the complete user
+        UserProfileManager.shared.saveUser(user)
 
         onSave()
         dismiss()
@@ -715,34 +722,40 @@ struct MeasurementsEditView: View {
     private func saveChanges() {
         let unit = preferences.measurementUnit
 
+        // Get current user and update directly to avoid binding issues
+        guard var user = UserProfileManager.shared.currentUser else {
+            dismiss()
+            return
+        }
+
         // Save weights (convert to kg if imperial)
         if let value = Double(currentWeight) {
-            healthProfile.currentWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
+            user.healthProfile.currentWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
         }
 
         if let value = Double(prePregnancyWeight) {
-            healthProfile.prePregnancyWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
+            user.healthProfile.prePregnancyWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
         }
 
         // Save height (convert to cm if imperial)
         if unit == .metric {
             if let value = Double(height) {
-                healthProfile.height = value
+                user.healthProfile.height = value
             }
         } else {
             if let feet = Int(heightFeet), let inches = Int(heightInches) {
-                healthProfile.height = MeasurementUnit.feetInchesToCm(feet: feet, inches: inches)
+                user.healthProfile.height = MeasurementUnit.feetInchesToCm(feet: feet, inches: inches)
             }
         }
 
         // Save date of birth
-        healthProfile.dateOfBirth = showDateOfBirth ? dateOfBirth : nil
+        user.healthProfile.dateOfBirth = showDateOfBirth ? dateOfBirth : nil
 
         // Save unit preference
-        UserProfileManager.shared.updateMeasurementUnit(unit)
+        user.preferences.measurementUnit = unit
 
-        // Explicitly save to UserProfileManager to ensure persistence
-        UserProfileManager.shared.saveHealthProfile(healthProfile)
+        // Save the complete user
+        UserProfileManager.shared.saveUser(user)
 
         onSave()
         dismiss()
@@ -865,16 +878,24 @@ struct GoalsEditView: View {
     }
 
     private func saveChanges() {
-        healthProfile.wellnessGoals = Array(selectedGoals)
-        healthProfile.activityLevel = selectedActivityLevel
-
-        if let value = Double(targetWeight) {
-            let unit = UserProfileManager.shared.measurementUnit
-            healthProfile.targetWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
+        // Get current user and update directly to avoid binding issues
+        guard var user = UserProfileManager.shared.currentUser else {
+            dismiss()
+            return
         }
 
-        // Explicitly save to UserProfileManager to ensure persistence
-        UserProfileManager.shared.saveHealthProfile(healthProfile)
+        // Update wellness goals and activity level
+        user.healthProfile.wellnessGoals = Array(selectedGoals)
+        user.healthProfile.activityLevel = selectedActivityLevel
+
+        // Update target weight if provided
+        if let value = Double(targetWeight) {
+            let unit = UserProfileManager.shared.measurementUnit
+            user.healthProfile.targetWeight = unit == .metric ? value : MeasurementUnit.lbsToKg(value)
+        }
+
+        // Save the complete user
+        UserProfileManager.shared.saveUser(user)
 
         onSave()
         dismiss()
