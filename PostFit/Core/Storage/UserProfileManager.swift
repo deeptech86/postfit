@@ -444,15 +444,27 @@ class UserProfileManager: ObservableObject {
 // MARK: - UserSessionManager Extension
 
 extension UserSessionManager {
-    /// Update stored user name
+    /// Update stored user name and refresh session
     func updateUserName(_ name: String) {
         UserDefaults.standard.set(name, forKey: "user_name")
+
+        // Also update the current session so computed properties reflect the change
+        if let session = currentSession {
+            currentSession = session.withUpdatedProfile(userName: name)
+        }
+
         objectWillChange.send()
     }
 
-    /// Update stored user email
+    /// Update stored user email and refresh session
     func updateUserEmail(_ email: String) {
         UserDefaults.standard.set(email, forKey: "user_email")
+
+        // Also update the current session so computed properties reflect the change
+        if let session = currentSession {
+            currentSession = session.withUpdatedProfile(email: email)
+        }
+
         objectWillChange.send()
     }
 }

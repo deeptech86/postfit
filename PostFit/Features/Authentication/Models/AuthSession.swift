@@ -123,4 +123,25 @@ extension AuthSession {
             expiresAt: expiresAt
         )
     }
+
+    /// Create updated session with new profile information
+    /// - Parameters:
+    ///   - userName: New user name (nil to keep current)
+    ///   - email: New email (nil to keep current)
+    /// - Returns: Updated AuthSession instance
+    func withUpdatedProfile(
+        userName: String? = nil,
+        email: String? = nil
+    ) -> AuthSession {
+        return AuthSession(
+            sessionToken: self.sessionToken,
+            refreshToken: self.refreshToken,
+            userId: self.userId,
+            email: email ?? self.email,
+            userName: userName ?? self.userName,
+            profileImageURL: self.profileImageURL,
+            provider: self.provider,
+            expiresAt: self.expiresAt
+        )
+    }
 }
